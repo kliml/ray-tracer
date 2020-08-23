@@ -1,13 +1,33 @@
 use std::io;
 
 mod color;
+mod hittable;
 mod ray;
+mod sphere;
 mod vec;
 
 use ray::Ray;
 use vec::{Color, Point3, Vec3};
 
+fn hit_sphere(center: Point3, radius: f32, ray: &Ray) -> f32 {
+    let oc = ray.origin() - center;
+    let a = ray.direction().length_squared();
+    let half_b = vec::dot(&oc, &ray.direction());
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = half_b * half_b - a * c;
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-half_b - discriminant.sqrt()) / a
+    }
+}
+
 fn ray_color(ray: &Ray) -> Color {
+    let t = hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, ray);
+    if t > 0.0 {
+        let n = vec::unit_vector(ray.at(t) - Vec3::new(0.0, 0.0, -1.0));
+        return Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0) * 0.5;
+    }
     let unit_direction = vec::unit_vector(ray.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t

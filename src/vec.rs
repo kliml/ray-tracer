@@ -1,5 +1,5 @@
 use std::fmt::{self, Formatter};
-use std::ops::{Add, Div, Index, Mul, Sub};
+use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
 pub type Point3 = Vec3;
 pub type Color = Vec3;
@@ -34,6 +34,13 @@ impl Vec3 {
 
     pub fn length_squared(&self) -> f32 {
         self.0[0] * self.0[0] + self.0[1] * self.0[1] + self.0[2] * self.0[2]
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Self::Output {
+        Vec3::new(-self.0[0], -self.0[1], -self.0[2])
     }
 }
 
