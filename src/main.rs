@@ -1,6 +1,7 @@
 use std::io;
 
 mod color;
+mod ray;
 mod vec;
 
 fn main() {
