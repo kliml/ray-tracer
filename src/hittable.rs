@@ -1,5 +1,6 @@
 use crate::{ray, vec};
 
+#[derive(Copy, Clone)]
 pub struct HitRecord {
     pub p: vec::Point3,
     pub normal: vec::Vec3,
@@ -8,8 +9,17 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
+    pub fn empty() -> HitRecord {
+        HitRecord {
+            p: vec::Point3::empty(),
+            normal: vec::Vec3::empty(),
+            t: f32::MIN,
+            front_face: true,
+        }
+    }
+
     pub fn set_normale_face(&mut self, ray: &ray::Ray, outward_normal: &vec::Vec3) {
-        self.front_face = vec::dot(&ray.direction(), outward_normal) > 0.0;
+        self.front_face = vec::dot(&ray.direction(), outward_normal) < 0.0;
         self.normal = if self.front_face {
             *outward_normal
         } else {
