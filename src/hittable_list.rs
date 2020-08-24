@@ -31,7 +31,7 @@ impl hittable::Hittable for HittableList {
         let mut closest = t_max;
 
         for object in &self.objects {
-            if object.hit(ray, t_min, t_max, &mut temp_record) {
+            if object.hit(ray, t_min, closest, &mut temp_record) {
                 hit_anything = true;
                 closest = temp_record.t;
                 *record = temp_record;
