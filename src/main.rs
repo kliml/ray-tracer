@@ -10,16 +10,23 @@ mod sphere;
 mod vec;
 
 use hittable::{HitRecord, Hittable};
-use rand::{prelude::*, *};
+use rand::prelude::*;
 use ray::Ray;
 use rtweekend::*;
 use sphere::Sphere;
 use vec::{Color, Point3, Vec3};
 
-fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
+fn ray_color(ray: &Ray, world: &dyn Hittable, rng: &mut ThreadRng, depth: i32) -> Color {
     let mut record = HitRecord::empty();
+
+    if depth <= 0 {
+        return Color::empty();
+    }
+
     if world.hit(ray, 0.0, INFINITY, &mut record) {
-        return (record.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
+        let target = record.p + record.normal + Vec3::random_in_unit_sphere(rng);
+        return ray_color(&Ray::new(record.p, target), world, rng, depth - 1) * 0.5;
+        //return (record.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
     }
     let unit_direction = vec::unit_vector(ray.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -33,6 +40,7 @@ fn main() {
     let image_width = 400;
     let image_height = (image_width as f32 / ascpect_ratio) as i32;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
 
@@ -56,10 +64,10 @@ fn main() {
         for i in 0..image_width {
             let mut pixel_color = Color::empty();
             for _ in 0..samples_per_pixel {
-                let u = (i as f32 + rng.gen::<f32>()) / (image_width - 1) as f32;
-                let v = (j as f32 + rng.gen::<f32>()) / (image_height - 1) as f32;
+                let u = (i as f32 + random_double(&mut rng)) / (image_width - 1) as f32;
+                let v = (j as f32 + random_double(&mut rng)) / (image_height - 1) as f32;
                 let ray = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(&ray, &mut world);
+                pixel_color = pixel_color + ray_color(&ray, &mut world, &mut rng, max_depth);
             }
             color::write_color(&mut handle, pixel_color, samples_per_pixel);
         }

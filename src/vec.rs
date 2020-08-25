@@ -1,3 +1,5 @@
+use crate::rtweekend::*;
+use rand::prelude::*;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
@@ -34,6 +36,28 @@ impl Vec3 {
 
     pub fn length_squared(&self) -> f32 {
         self.0[0] * self.0[0] + self.0[1] * self.0[1] + self.0[2] * self.0[2]
+    }
+
+    pub fn random(rng: &mut ThreadRng) -> Vec3 {
+        Vec3::new(random_double(rng), random_double(rng), random_double(rng))
+    }
+
+    pub fn random_range(rng: &mut ThreadRng, min: f32, max: f32) -> Vec3 {
+        Vec3::new(
+            random_double_range(rng, min, max),
+            random_double_range(rng, min, max),
+            random_double_range(rng, min, max),
+        )
+    }
+
+    pub fn random_in_unit_sphere(rng: &mut ThreadRng) -> Vec3 {
+        loop {
+            let vec = Vec3::random_range(rng, -1.0, 1.0);
+            if vec.length_squared() >= 1.0 {
+                continue;
+            }
+            return vec;
+        }
     }
 }
 

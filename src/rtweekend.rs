@@ -1,4 +1,4 @@
-use rand;
+use rand::prelude::*;
 
 // Constants
 
@@ -19,4 +19,12 @@ pub fn clamp(x: f32, min: f32, max: f32) -> f32 {
         return max;
     }
     x
+}
+
+pub fn random_double(rng: &mut ThreadRng) -> f32 {
+    rng.gen::<f32>()
+}
+
+pub fn random_double_range(rng: &mut ThreadRng, min: f32, max: f32) -> f32 {
+    min + (max - min) * random_double(rng)
 }
