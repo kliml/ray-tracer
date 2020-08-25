@@ -23,8 +23,9 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, rng: &mut ThreadRng, depth: i32) -
         return Color::empty();
     }
 
-    if world.hit(ray, 0.0, INFINITY, &mut record) {
-        let target = record.p + record.normal + Vec3::random_in_unit_sphere(rng);
+    if world.hit(ray, 0.001, INFINITY, &mut record) {
+        // let target = record.p + record.normal + Vec3::random_in_unit_sphere(rng);
+        let target = record.p + record.normal + Vec3::random_unit_vector(rng);
         return ray_color(&Ray::new(record.p, target), world, rng, depth - 1) * 0.5;
         //return (record.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
     }
