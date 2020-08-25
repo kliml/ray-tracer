@@ -61,7 +61,7 @@ impl Vec3 {
     }
 
     pub fn random_unit_vector(rng: &mut ThreadRng) -> Vec3 {
-        let a = random_double_range(rng, 0.0, PI);
+        let a = random_double_range(rng, 0.0, 2.0 * PI);
         let z = random_double_range(rng, -1.0, 1.0);
         let r = (1.0 - z * z).sqrt();
         Vec3::new(r * f32::cos(a), r * f32::sin(a), z)
