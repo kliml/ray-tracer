@@ -34,7 +34,7 @@ impl hittable::Hittable for HittableList {
             if object.hit(ray, t_min, closest, &mut temp_record) {
                 hit_anything = true;
                 closest = temp_record.t;
-                *record = temp_record;
+                *record = temp_record.clone();
             }
         }
 

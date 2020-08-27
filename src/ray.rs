@@ -10,6 +10,13 @@ impl Ray {
         Ray { origin, direction }
     }
 
+    pub fn empty() -> Ray {
+        Ray {
+            origin: Point3::empty(),
+            direction: Vec3::empty(),
+        }
+    }
+
     pub fn origin(&self) -> Point3 {
         self.origin
     }
