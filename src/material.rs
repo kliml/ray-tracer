@@ -1,4 +1,4 @@
-use crate::{hittable, ray, vec};
+use crate::{hittable, ray, rtweekend::*, vec};
 use rand::prelude::*;
 
 pub trait Material {
@@ -95,8 +95,29 @@ impl Material for Dielectric {
             self.reflection_index
         };
         let unit_direction = vec::unit_vector(ray.direction());
+
+        let cos_theta = vec::dot(&-unit_direction, &record.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+        if etai_over_etat * sin_theta > 1.0 {
+            let reflected = vec::reflect(&unit_direction, &record.normal);
+            *scattered = ray::Ray::new(record.p, reflected);
+            return true;
+        }
+
+        let reflect_prob = schlick(cos_theta, etai_over_etat);
+        if random_double(rng) < reflect_prob {
+            let reflected = vec::reflect(&unit_direction, &record.normal);
+            *scattered = ray::Ray::new(record.p, reflected);
+            return true;
+        }
+
         let refracted = vec::refract(&unit_direction, &record.normal, etai_over_etat);
         *scattered = ray::Ray::new(record.p, refracted);
         true
     }
+}
+
+fn schlick(cosine: f32, ref_idx: f32) -> f32 {
+    let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
+    r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
