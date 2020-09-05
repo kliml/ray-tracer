@@ -46,7 +46,7 @@ fn main() {
     // Image
 
     let ascpect_ratio = 16.0 / 9.0;
-    let image_width = 400;
+    let image_width = 1920;
     let image_height = (image_width as f32 / ascpect_ratio) as i32;
     let samples_per_pixel = 100;
     let max_depth = 50;
@@ -61,6 +61,7 @@ fn main() {
     let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
     let mut world = hittable_list::HittableList::new();
+
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -100.5, -1.0),
         100.0,
@@ -72,24 +73,30 @@ fn main() {
         material_center.clone(),
     )));
     world.add(Box::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0),
-        0.5,
-        material_left.clone(),
-    )));
-    world.add(Box::new(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
         material_right.clone(),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
-        -0.4,
+        0.5,
+        material_left.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.45,
         material_left.clone(),
     )));
 
     // Camera
 
-    let camera = camera::Camera::new();
+    let camera = camera::Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        ascpect_ratio,
+    );
     let mut rng = rand::thread_rng();
 
     // Renderer
