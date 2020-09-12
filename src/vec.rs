@@ -49,23 +49,6 @@ impl Vec3 {
             random_double_range(rng, min, max),
         )
     }
-
-    pub fn random_in_unit_sphere(rng: &mut ThreadRng) -> Vec3 {
-        loop {
-            let vec = Vec3::random_range(rng, -1.0, 1.0);
-            if vec.length_squared() >= 1.0 {
-                continue;
-            }
-            return vec;
-        }
-    }
-
-    pub fn random_unit_vector(rng: &mut ThreadRng) -> Vec3 {
-        let a = random_double_range(rng, 0.0, 2.0 * PI);
-        let z = random_double_range(rng, -1.0, 1.0);
-        let r = (1.0 - z * z).sqrt();
-        Vec3::new(r * f32::cos(a), r * f32::sin(a), z)
-    }
 }
 
 impl Neg for Vec3 {
@@ -94,6 +77,13 @@ impl Add for Vec3 {
     }
 }
 
+impl Add<f32> for Vec3 {
+    type Output = Self;
+    fn add(self, other: f32) -> Self {
+        Vec3([self.0[0] + other, self.0[1] + other, self.0[2] + other])
+    }
+}
+
 impl Sub for Vec3 {
     type Output = Self;
     fn sub(self, other: Vec3) -> Self {
@@ -102,6 +92,13 @@ impl Sub for Vec3 {
             self.0[1] - other.0[1],
             self.0[2] - other.0[2],
         ])
+    }
+}
+
+impl Sub<f32> for Vec3 {
+    type Output = Self;
+    fn sub(self, other: f32) -> Self {
+        Vec3([self.0[0] - other, self.0[1] - other, self.0[2] - other])
     }
 }
 
@@ -161,4 +158,35 @@ pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f32) -> Vec3 {
     let r_out_perp = (*uv + *n * cos_theta) * etai_over_etat;
     let r_out_parallel = *n * -((1.0 - r_out_perp.length_squared()).abs()).sqrt();
     r_out_perp + r_out_parallel
+}
+
+pub fn random_in_unit_sphere(rng: &mut ThreadRng) -> Vec3 {
+    loop {
+        let vec = Vec3::random_range(rng, -1.0, 1.0);
+        if vec.length_squared() >= 1.0 {
+            continue;
+        }
+        return vec;
+    }
+}
+
+pub fn random_unit_vector(rng: &mut ThreadRng) -> Vec3 {
+    let a = random_double_range(rng, 0.0, 2.0 * PI);
+    let z = random_double_range(rng, -1.0, 1.0);
+    let r = (1.0 - z * z).sqrt();
+    Vec3::new(r * f32::cos(a), r * f32::sin(a), z)
+}
+
+pub fn random_in_unit_disc(rng: &mut ThreadRng) -> Vec3 {
+    loop {
+        let p = Vec3::new(
+            random_double_range(rng, -1.0, 1.0),
+            random_double_range(rng, -1.0, 1.0),
+            0.0,
+        );
+        if p.length_squared() >= 1.0 {
+            continue;
+        }
+        return p;
+    }
 }

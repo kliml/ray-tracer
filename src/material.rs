@@ -31,7 +31,7 @@ impl Material for Lambertian {
         scattered: &mut ray::Ray,
         rng: &mut ThreadRng,
     ) -> bool {
-        let scatter_direction = record.normal + vec::Vec3::random_unit_vector(rng);
+        let scatter_direction = record.normal + vec::random_unit_vector(rng);
         *scattered = ray::Ray::new(record.p, scatter_direction);
         *attenuation = self.albedo;
         true
@@ -62,7 +62,7 @@ impl Material for Metal {
         let reflected = vec::reflect(&ray.direction(), &record.normal);
         *scattered = ray::Ray::new(
             record.p,
-            reflected + vec::Vec3::random_in_unit_sphere(rng) * self.fuzz,
+            reflected + vec::random_in_unit_sphere(rng) * self.fuzz,
         );
         *attenuation = self.albedo;
         vec::dot(&scattered.direction(), &record.normal) > 0.0
