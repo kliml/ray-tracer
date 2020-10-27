@@ -4,22 +4,26 @@ use std::rc::Rc;
 mod camera;
 mod color;
 mod hittable;
-mod hittable_list;
+//mod hittable_list;
+mod aabb;
 mod material;
 mod ray;
-mod rtweekend;
 mod sphere;
 mod triangle;
+mod utility;
 mod vec;
 
 use hittable::{HitRecord, Hittable};
 use material::*;
 use rand::prelude::*;
 use ray::Ray;
-use rtweekend::*;
 use sphere::Sphere;
+use utility::*;
 //use triangle::Triangle;
 use vec::{Color, Point3, Vec3};
+
+const SAMPLES_PER_PIXEL: i32 = 100;
+const MAX_DEPTH: i32 = 50;
 
 fn ray_color(ray: &mut Ray, world: &dyn Hittable, rng: &mut ThreadRng, depth: i32) -> Color {
     let mut record = HitRecord::empty();
@@ -28,7 +32,7 @@ fn ray_color(ray: &mut Ray, world: &dyn Hittable, rng: &mut ThreadRng, depth: i3
         return Color::empty();
     }
 
-    if world.hit(ray, 0.001, INFINITY, &mut record) {
+    if world.hit(ray, &mut 0.001, &mut INFINITY, &mut record) {
         let mut scattered = Ray::empty();
         let mut attenuation = Color::empty();
         if record
@@ -44,8 +48,8 @@ fn ray_color(ray: &mut Ray, world: &dyn Hittable, rng: &mut ThreadRng, depth: i3
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
-fn random_scene(rng: &mut ThreadRng) -> hittable_list::HittableList {
-    let mut world = hittable_list::HittableList::new();
+fn random_scene(rng: &mut ThreadRng) -> hittable::HittableList {
+    let mut world = hittable::HittableList::new();
     let material_ground = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
@@ -108,8 +112,8 @@ fn main() {
     let ascpect_ratio = 16.0 / 9.0;
     let image_width = 1920;
     let image_height = (image_width as f32 / ascpect_ratio) as i32;
-    let samples_per_pixel = 500;
-    let max_depth = 50;
+    //let samples_per_pixel = 500;
+    //let max_depth = 50;
 
     // World
 
@@ -187,13 +191,13 @@ fn main() {
         eprint!("\rScanlines remaining: {}", j);
         for i in 0..image_width {
             let mut pixel_color = Color::empty();
-            for _ in 0..samples_per_pixel {
+            for _ in 0..SAMPLES_PER_PIXEL {
                 let u = (i as f32 + random_double(&mut rng)) / (image_width - 1) as f32;
                 let v = (j as f32 + random_double(&mut rng)) / (image_height - 1) as f32;
                 let mut ray = camera.get_ray(u, v, &mut rng);
-                pixel_color = pixel_color + ray_color(&mut ray, &mut world, &mut rng, max_depth);
+                pixel_color = pixel_color + ray_color(&mut ray, &mut world, &mut rng, MAX_DEPTH);
             }
-            color::write_color(&mut handle, pixel_color, samples_per_pixel);
+            color::write_color(&mut handle, pixel_color, SAMPLES_PER_PIXEL);
         }
     }
     eprint!("\nDone.\n");

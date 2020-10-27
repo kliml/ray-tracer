@@ -1,5 +1,5 @@
 use crate::ray::Ray;
-use crate::rtweekend::*;
+use crate::utility::*;
 use crate::vec::*;
 use rand::prelude::*;
 

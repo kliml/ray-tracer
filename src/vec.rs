@@ -1,4 +1,4 @@
-use crate::rtweekend::*;
+use crate::utility::*;
 use rand::prelude::*;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Div, Index, Mul, Neg, Sub};

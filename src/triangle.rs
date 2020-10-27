@@ -1,4 +1,4 @@
-use crate::{hittable, material, ray, vec, vec::*};
+use crate::{aabb, hittable, material, ray, vec, vec::*};
 use std::rc::Rc;
 
 pub struct Triangle {
@@ -17,8 +17,8 @@ impl hittable::Hittable for Triangle {
     fn hit(
         &self,
         ray: &ray::Ray,
-        t_min: f32,
-        t_max: f32,
+        t_min: &mut f32,
+        t_max: &mut f32,
         record: &mut hittable::HitRecord,
     ) -> bool {
         let e1 = self.vertices[0] - self.vertices[1];
@@ -50,7 +50,7 @@ impl hittable::Hittable for Triangle {
         }
 
         let t = vec::dot(&e2, &qvec) * inv_det;
-        if t < t_max && t > t_min {
+        if t < *t_max && t > *t_min {
             record.t = vec::dot(&e2, &qvec) * inv_det;
             record.p = ray.at(record.t);
             // outward normal
@@ -61,5 +61,9 @@ impl hittable::Hittable for Triangle {
             return true;
         }
         false
+    }
+
+    fn bounding_box(&self, t0: f32, t1: f32, output_box: &mut aabb::Aabb) -> bool {
+        unimplemented!();
     }
 }

@@ -1,4 +1,4 @@
-use crate::{hittable, material, ray, vec};
+use crate::{aabb, hittable, material, ray, vec};
 use std::rc::Rc;
 
 pub struct Sphere {
@@ -21,8 +21,8 @@ impl hittable::Hittable for Sphere {
     fn hit(
         &self,
         ray: &ray::Ray,
-        t_min: f32,
-        t_max: f32,
+        t_min: &mut f32,
+        t_max: &mut f32,
         record: &mut hittable::HitRecord,
     ) -> bool {
         let oc = ray.origin() - self.center;
@@ -35,7 +35,7 @@ impl hittable::Hittable for Sphere {
             let root = discriminant.sqrt();
 
             let mut temp = (-half_b - root) / a;
-            if temp < t_max && temp > t_min {
+            if temp < *t_max && temp > *t_min {
                 record.t = temp;
                 record.p = ray.at(record.t);
                 let outward_normal = (record.p - self.center) / self.radius;
@@ -45,7 +45,7 @@ impl hittable::Hittable for Sphere {
             }
 
             temp = (-half_b + root) / a;
-            if temp < t_max && temp > t_min {
+            if temp < *t_max && temp > *t_min {
                 record.t = temp;
                 record.p = ray.at(record.t);
                 let outward_normal = (record.p - self.center) / self.radius;
@@ -55,5 +55,13 @@ impl hittable::Hittable for Sphere {
             }
         }
         false
+    }
+
+    fn bounding_box(&self, t0: f32, t1: f32, output_box: &mut aabb::Aabb) -> bool {
+        *output_box = aabb::Aabb::new(
+            self.center - vec::Vec3::new(self.radius, self.radius, self.radius),
+            self.center + vec::Vec3::new(self.radius, self.radius, self.radius),
+        );
+        true
     }
 }

@@ -1,4 +1,4 @@
-use crate::{hittable, ray, rtweekend::*, vec};
+use crate::{hittable, ray, utility::*, vec};
 use rand::prelude::*;
 
 pub trait Material {
